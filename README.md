@@ -7,7 +7,7 @@ Extends WireMail to use the Postmark API for sending emails.
 3. In your admin, go to Modules > Refresh, then Modules > New, then click on the Install button for this module.
 
 # API
-Prior to using this module, you must set up a server in your [Postmark account](https://account.postmarkapp.com/servers) and create an API Token. You should also set up a [Sender Signature](https://account.postmarkapp.com/signature_domains) Add the API Token and Sender Signature to the module's settings.
+Prior to using this module, you must set up a server in your [Postmark account](https://account.postmarkapp.com/servers) and create an API Token. You should also set up a [Sender Signature](https://account.postmarkapp.com/signature_domains). Add the API Token and Sender Signature to the module configuration.
 
 ## Usage
 Usage is similar to the basic WireMail implementation, although a few extra options are available. Please refer to the [WireMail documentation](https://processwire.com/api/ref/wire-mail/) for full instructions on using WireMail, and to the examples below.
@@ -19,7 +19,7 @@ The following are extra methods implemented by this module:
 The following methods can be used in a chained statement:
 
 **setSenderSignature(**_string_ **$senderSignature)** - Set a different sender signature than the default.
-- Must have a registered and confirmed Sender Signature.
+- Must use a registered and confirmed Sender Signature.
 - To include a name, use the format "Full Name \<sender@domain.com\>" for the address.
 
 **cc(**_string|array|null_ **$email)** - Set a "cc" email address.
@@ -48,9 +48,9 @@ The following methods can be used in a chained statement:
 **setSendBatch(**_bool_ **$sendBatch)** - Set the batch mode.
 - This is off by default, meaning that a single email is sent with each recipient seeing the other recipients
 - If this is on, any email addresses set by `cc()` and `bcc()` will be ignored
-- Postmark has a limit on 50 emails per message and 500 messages per batch request. This module will split the recipients into batches if necessary and will also split up batches of messages too.
+- Postmark has a limit on 50 email addresses per message and 500 messages per batch request. This module will split the recipients into batches if necessary and will also split up batches of messages too.
 
-**setRecipientVariables(**_array_ **$variables**, _string_ **$email)** - Set the recipient variables
+**setRecipientVariables(**_array_ **$variables**, _string_ **$email** = ''**)** - Set the recipient variables
 - `$variables` should be an array of data keyed by the recipient email address, or specific for a recipient specified by `$email`.
 - Variables are only used when either `$sendBatch` or a template is being used.
 
@@ -64,7 +64,7 @@ The following methods can be used in a chained statement:
 ### Other
 
 **getClient()** - Return the Postmark client.
-- For more details please see the documentation for [postmark-php](https://github.com/ActiveCampaign/postmark-php/wiki/Getting-Started)
+- For more details please see the documentation for [postmark-php](https://github.com/ActiveCampaign/postmark-php/wiki/Getting-Started).
 
 **getResponse(**_int_ **$index** = `null`**)** - Return the last send() response
 - Returns a `Postmark\Models\DynamicResponseModel` object.
@@ -197,7 +197,7 @@ $postmark->to([
 
 // to =
 // A User <user@domain.com>
-// Another User (changed name) <user2@domain.com>
+// Another User <user2@domain.com>
 //
 // recipientVariables =
 // {
@@ -224,8 +224,8 @@ How you set up your templates and layouts in Postmark is up to you, and this wil
 This module provides some defaults however. Alongside `toName` and `toEmail`, if a `body` or `bodyHTML` is set, these variables are also passed when using a template. The module will also attempt to replace any tags in these values with template/recipient variables. Hopefully the example below will demonstrate this:
 
 ```php
-$mail->new()
-	->to('user@example.com, user2@example.com')
+$postmark = $mail->new();
+$postmark->to('user@example.com, user2@example.com')
 	->setTemplate('template1')
 	->setTemplateVariables([
 		'siteUrl' => $pages->get(1)->httpUrl, // https://www.example.com/
