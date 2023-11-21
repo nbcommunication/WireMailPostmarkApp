@@ -123,6 +123,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 	 *
 	 */
 	protected $sendBatch = false;
+
 	/**
 	 * The template alias or id
 	 *
