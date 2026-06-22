@@ -10,7 +10,7 @@
  *
  * #pw-var $postmark
  *
- * @copyright 2025 NB Communication Ltd
+ * @copyright 2026 NB Communication Ltd
  * @license Mozilla Public License v2.0 http://mozilla.org/MPL/2.0/
  *
  * @property string $serverToken
@@ -37,7 +37,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 	public static function getModuleInfo() {
 		return [
 			'title' => 'WireMail Postmark API',
-			'version' => 003,
+			'version' => '0.0.4',
 			'summary' => 'Extends WireMail to use the Postmark API for sending emails.',
 			'author' => 'nbcommunication',
 			'href' => 'https://github.com/nbcommunication/WireMailPostmarkApp',
@@ -684,10 +684,10 @@ class WireMailPostmarkApp extends WireMail implements Module {
 	 * @return string
 	 *
 	 */
-	protected function populateVariables($str, $variables) {
+	protected function populateVariables($str, array $variables) {
 		foreach($variables as $key => $value) {
 			if(!is_array($value)) {
-				$str = str_replace('{{' . $key . '}}', $value, $str);
+				$str = str_replace('{{' . $key . '}}', $value ?? '', $str);
 			}
 		}
 		return $str;
