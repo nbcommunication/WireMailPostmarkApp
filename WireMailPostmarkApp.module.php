@@ -37,7 +37,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 	public static function getModuleInfo() {
 		return [
 			'title' => 'WireMail Postmark API',
-			'version' => '0.0.4',
+			'version' => '0.0.5',
 			'summary' => 'Extends WireMail to use the Postmark API for sending emails.',
 			'author' => 'nbcommunication',
 			'href' => 'https://github.com/nbcommunication/WireMailPostmarkApp',
@@ -160,7 +160,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 			$this->bcc();
 		} catch(PostmarkException $e) {
 			$this->log($e->getMessage());
-		} catch(Exception $e) {
+		} catch(\Exception $e) {
 			$this->log($e->getMessage());
 		}
 	}
@@ -461,7 +461,6 @@ class WireMailPostmarkApp extends WireMail implements Module {
 			if($hasAttachments || $hasInline) {
 				// Attachments
 				if($hasAttachments) {
-					$i = 0;
 					foreach($this->mail['attachments'] as $filename => $file) {
 						$mime = $this->getMimeType($file);
 						if($mime) {
@@ -475,7 +474,6 @@ class WireMailPostmarkApp extends WireMail implements Module {
 				}
 				// Inline images
 				if($hasInline) {
-					$i = 0;
 					foreach($this->inline as $filename => $file) {
 						$mime = $this->getMimeType($file);
 						if($mime) {
@@ -503,7 +501,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 				'TrackOpens' => (bool) $this->trackOpens,
 				'ReplyTo' => $replyTo,
 				'Cc' => $this->getEmails($this->mail['ccName']),
-				'BCc' => $this->getEmails($this->mail['bccName']),
+				'Bcc' => $this->getEmails($this->mail['bccName']),
 				'Headers' => count($this->mail['header']) ? $this->mail['header'] : null,
 				'Attachments' => count($attachments) ? $attachments : null,
 				'TrackLinks' => in_array($trackLinks, self::optionsTrackLinks) ? $trackLinks : 'None',
@@ -563,7 +561,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 							'TrackOpens' => $message['TrackOpens'],
 							'ReplyTo' => $message['ReplyTo'],
 							'Cc' => $variables['Cc'] ?? $message['Cc'],
-							'BCc' => $variables['BCc'] ?? $message['BCc'],
+							'Bcc' => $variables['Bcc'] ?? $message['Bcc'],
 							'Headers' => $message['Headers'],
 							'Attachments' => $message['Attachments'],
 							'TrackLinks' => $message['TrackLinks'],
@@ -632,7 +630,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 					$message['TrackOpens'],
 					$message['ReplyTo'],
 					$message['Cc'],
-					$message['BCc'],
+					$message['Bcc'],
 					$message['Headers'],
 					$message['Attachments'],
 					$message['TrackLinks'],
@@ -645,7 +643,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 
 		} catch(PostmarkException $e) {
 			$this->log($e->getMessage());
-		} catch(Exception $e) {
+		} catch(\Exception $e) {
 			$this->log($e->getMessage());
 		}
 

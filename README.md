@@ -3,8 +3,13 @@ Extends WireMail to use the Postmark API for sending emails.
 
 # Installation
 1. Download the [zip file](https://github.com/nbcommunication/WireMailPostmarkApp/archive/master.zip) at Github or clone the repo into your `site/modules` directory.
-2. If you downloaded the zip file, extract it in your `sites/modules` directory.
+2. If you downloaded the zip file, extract it in your `site/modules` directory.
 3. In your admin, go to Modules > Refresh, then Modules > New, then click on the Install button for this module.
+
+# Requirements
+- ProcessWire >= 3.0.123
+- PHP >= 7.4
+- [postmark-php](https://github.com/ActiveCampaign/postmark-php) ^4.0 (bundled with this module via Composer)
 
 # API
 Prior to using this module, you must set up a server in your [Postmark account](https://account.postmarkapp.com/servers) and create an API Token. You should also set up a [Sender Signature](https://account.postmarkapp.com/signature_domains). Add the API Token and Sender Signature to the module configuration.
@@ -301,6 +306,12 @@ The two HTML emails sent:
 $postmarkClient = $modules->get('WireMailPostmarkApp')->getClient();
 $postmarkClient->getOpenStatistics();
 ```
+
+## Changelog
+
+### 0.0.5
+- Fixed: BCC recipients were silently dropped when using batch sends or template sends due to an incorrect array key (`BCc` instead of `Bcc`).
+- Fixed: Exception handling in `init()` and `send()` referenced an unqualified `Exception` class, which would fatal error if a non-Postmark exception (e.g. a network-level exception) was thrown. Now correctly catches `\Exception`.
 
 ## Setting WireMailPostmarkApp as default
 
