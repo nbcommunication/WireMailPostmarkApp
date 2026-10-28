@@ -717,7 +717,9 @@ class WireMailPostmarkApp extends WireMail implements Module {
 	/**
 	 * Obfuscate the local part of any email addresses in a string
 	 *
-	 * e.g. username@domain.com becomes us****me@domain.com
+	 * e.g. username@domain.com becomes us••••me@domain.com
+	 *
+	 * Uses • rather than * as ProcessWire renders log entries as Markdown.
 	 *
 	 * @param string $str
 	 * @return string
@@ -728,8 +730,8 @@ class WireMailPostmarkApp extends WireMail implements Module {
 			$local = $m[1];
 			$length = strlen($local);
 			$local = $length > 4 ?
-				substr($local, 0, 2) . str_repeat('*', $length - 4) . substr($local, -2) :
-				substr($local, 0, 1) . str_repeat('*', $length - 1);
+				substr($local, 0, 2) . str_repeat('•', $length - 4) . substr($local, -2) :
+				substr($local, 0, 1) . str_repeat('•', $length - 1);
 			return "$local@$m[2]";
 		}, (string) $str);
 	}
