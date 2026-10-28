@@ -58,6 +58,7 @@ The following methods can be used in a chained statement:
 **setRecipientVariables(**_array_ **$variables**, _string_ **$email** = ''**)** - Set the recipient variables
 - `$variables` should be an array of data keyed by the recipient email address, or specific for a recipient specified by `$email`.
 - Variables are only used when either `$sendBatch` or a template is being used.
+- With `$sendBatch`, `{{variable}}` placeholders in the subject, body and HTML body are replaced for each recipient.
 
 **setTemplate(**_string_ **$template**, _array_ **$variables** = [], _bool_ **$inlineCss** = `true`**)** - Set the template alias or id
 - You can set template variables by passing an array to `$variables`.
@@ -319,6 +320,7 @@ $config->wireMail('module', 'WireMailPostmarkApp');
 - Changed: per-recipient BCC overrides in template sends are now read from the `Bcc` recipient variable (previously `BCc`).
 - Fixed: exception handling in `init()` and `send()` caught an unqualified `Exception`, which resolved to the non-existent `ProcessWire\Exception`, so non-Postmark exceptions were not caught and escaped from `send()`. It now catches `\Throwable`, so these are logged instead.
 - Added: responses without a `MessageID` are now logged with Postmark's error message and code. Recipient email addresses are logged (not names) and obfuscated, e.g. `us****me@domain.com`. Email addresses in logged exception messages from `send()` are obfuscated too.
+- Added: with `setSendBatch(true)`, `{{variable}}` placeholders in the subject are now replaced for each recipient, as they are in the body.
 - Fixed: the "Track links?" module setting was ignored because the toggle value (`1`/`0`) wasn't mapped to a Postmark option, so link tracking was always `None` unless set in code.
 - Fixed: batch and template sends returned the full recipient count if any response from the instance had ever succeeded. `send()` now returns the number of recipients whose messages Postmark accepted, and responses are cleared at the start of each send.
 - Fixed: in batch and template sends, cc/bcc recipients received a copy of every message. They are now only added to the first message.

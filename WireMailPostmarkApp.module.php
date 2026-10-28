@@ -588,6 +588,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 					foreach($recipients as $sendTo => $variables) {
 						$messages[] = array_merge($message, count($messages) ? $noCopies : $copies, [
 							'To' => $sendTo,
+							'Subject' => $this->populateVariables($message['Subject'], $variables),
 							'HtmlBody' => $this->populateVariables($message['HtmlBody'], $variables),
 							'TextBody' => $this->populateVariables($message['TextBody'], $variables),
 						]);

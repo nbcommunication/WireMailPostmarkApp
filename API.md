@@ -138,8 +138,8 @@ $mail->setRecipientVariables([
 ]);
 ```
 
-Variables are available in the plain-text/HTML body via `{{variableName}}`
-placeholders (see Recipient Variables below), and are also passed as
+Variables are available in the subject and plain-text/HTML body via
+`{{variableName}}` placeholders (see Recipient Variables below), and are also passed as
 `TemplateModel` values when using `setTemplate()`.
 
 ### setTemplate($template, $variables = [], $inlineCss = true)
@@ -231,7 +231,7 @@ rather than wrapping `send()` in a try/catch.
 ## Recipient variable placeholders
 
 When not using a Postmark Template, `{{variableName}}` placeholders in the
-plain-text `body()` and HTML `bodyHTML()` content are replaced per-recipient
+`subject()`, plain-text `body()` and HTML `bodyHTML()` are replaced per-recipient
 using values from `setRecipientVariables()`. This only takes effect when
 `setSendBatch(true)` has been called. Automatic batching (more than 50
 recipients) does not replace placeholders, as each message goes to a group
