@@ -321,3 +321,5 @@ $config->wireMail('module', 'WireMailPostmarkApp');
 - Changed: per-recipient BCC overrides in template sends are now read from the `Bcc` recipient variable (previously `BCc`).
 - Fixed: exception handling in `init()` and `send()` caught an unqualified `Exception`, which resolved to the non-existent `ProcessWire\Exception`, so non-Postmark exceptions were not caught and escaped from `send()`. It now catches `\Throwable`, so these are logged instead.
 - Added: responses without a `MessageID` are now logged with Postmark's error message and code. Recipient email addresses are logged (not names) and obfuscated, e.g. `us****me@domain.com`.
+- Fixed: the "Track links?" module setting was ignored because the toggle value (`1`/`0`) wasn't mapped to a Postmark option, so link tracking was always `None` unless set in code.
+- Fixed: batch and template sends returned the full recipient count if any response from the instance had ever succeeded. `send()` now returns the number of recipients whose messages Postmark accepted, and responses are cleared at the start of each send.

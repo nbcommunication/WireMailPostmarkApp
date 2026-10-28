@@ -189,18 +189,18 @@ returns that specific response from a prior batch send instead.
 
 ### getResponses()
 
-Returns the array of responses from batch sends (i.e. when the recipient
-count exceeded the auto-batch threshold, `setSendBatch()` was used, or a
-template send occurred). Responses accumulate across sends on the same
-instance; use a fresh `wireMail()` instance per send to keep them separate.
+Returns the array of successful responses from the most recent batch send
+(i.e. when the recipient count exceeded the auto-batch threshold,
+`setSendBatch()` was used, or a template send occurred). Responses are
+cleared at the start of each `send()`.
 
 ## send()
 
 Standard `WireMail::send()`. Returns an `int`:
 
 - Single send: `1` on success (a `MessageID` was returned), `0` on failure.
-- Batch/template send: the number of recipients (`0` if no responses were
-  successful).
+- Batch/template send: the number of recipients whose messages Postmark
+  accepted (`0` if none were). Failed messages are logged.
 
 Exceptions and errors (`PostmarkException` and any other `\Throwable`) are
 caught internally and written to the module's log rather than being thrown -

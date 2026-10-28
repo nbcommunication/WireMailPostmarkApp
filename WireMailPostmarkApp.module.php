@@ -431,6 +431,10 @@ class WireMailPostmarkApp extends WireMail implements Module {
 
 		$sent = 0;
 
+		// Clear responses from any previous send
+		$this->response = null;
+		$this->responses = [];
+
 		try {
 
 			// When sending a password reset email, prevent Open/Click Tracking
@@ -489,8 +493,9 @@ class WireMailPostmarkApp extends WireMail implements Module {
 				}
 			}
 
-			$trackLinks = is_bool($this->trackLinks) ?
-				self::optionsTrackLinks[(int) $this->trackLinks] :
+			// The module config stores trackLinks as a 0/1 toggle value
+			$trackLinks = is_bool($this->trackLinks) || is_numeric($this->trackLinks) ?
+				self::optionsTrackLinks[(int) (bool) $this->trackLinks] :
 				$this->trackLinks;
 
 			$message = [
@@ -544,6 +549,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 				}
 
 				$messages = [];
+				$messageRecipients = []; // The number of recipients for each message
 				if($this->template) {
 
 					foreach($recipients as $sendTo => $variables) {
@@ -569,6 +575,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 							'Metadata' => $message['Metadata'],
 							'MessageStream' => $message['MessageStream'],
 						];
+						$messageRecipients[] = 1;
 					}
 
 				} else if($this->sendBatch) {
@@ -579,6 +586,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 							'HtmlBody' => $this->populateVariables($message['HtmlBody'], $variables),
 							'TextBody' => $this->populateVariables($message['TextBody'], $variables),
 						]);
+						$messageRecipients[] = 1;
 					}
 
 				} else {
@@ -587,12 +595,14 @@ class WireMailPostmarkApp extends WireMail implements Module {
 					$offset = 0;
 					$limit = self::toLimit;
 					do {
+						$group = array_slice($to, $offset, $limit);
 						$messages[] = array_merge(
 							$message,
 							[
-								'To' => $this->getEmails(array_slice($to, $offset, $limit)),
+								'To' => $this->getEmails($group),
 							]
 						);
+						$messageRecipients[] = count($group);
 						$offset = $offset + $limit;
 					} while($offset < $c);
 				}
@@ -610,6 +620,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 					foreach($responses as $i => $response) {
 						if($response->MessageID) {
 							$this->responses[] = $response;
+							$sent += $messageRecipients[$offset + $i] ?? 0;
 						} else {
 							$this->logResponseError($response, $batchMessages[$i]['To'] ?? '');
 						}
@@ -618,8 +629,6 @@ class WireMailPostmarkApp extends WireMail implements Module {
 					$offset = $offset + $limit;
 
 				} while($offset < $cm);
-
-				$sent = count($this->responses) ? $c : 0;
 
 			} else {
 
