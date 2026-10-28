@@ -37,7 +37,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 	public static function getModuleInfo() {
 		return [
 			'title' => 'WireMail Postmark API',
-			'version' => '0.0.5',
+			'version' => '0.1.0',
 			'summary' => 'Extends WireMail to use the Postmark API for sending emails.',
 			'author' => 'nbcommunication',
 			'href' => 'https://github.com/nbcommunication/WireMailPostmarkApp',
@@ -104,7 +104,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 	/**
 	 * The last response
 	 *
-	 * @var Postmark\Models\DynamicResponseModel
+	 * @var Postmark\Models\PostmarkResponse
 	 *
 	 */
 	protected $response = null;
@@ -156,7 +156,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 	public function init() {
 
 		try {
-			$this->client = new PostmarkClient($this->serverToken);
+			$this->client = new PostmarkClient((string) $this->serverToken);
 			$this->cc();
 			$this->bcc();
 		} catch(PostmarkException $e) {
@@ -396,7 +396,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 	 * Return the last send() response
 	 *
 	 * @param int $index
-	 * @return Postmark\Models\DynamicResponseModel
+	 * @return Postmark\Models\PostmarkResponse
 	 *
 	 */
 	public function getResponse($index = null) {
@@ -500,8 +500,8 @@ class WireMailPostmarkApp extends WireMail implements Module {
 				$this->trackLinks;
 
 			$message = [
-				'From' => $this->senderSignature,
-				'Subject' => $this->mail['subject'],
+				'From' => (string) $this->senderSignature,
+				'Subject' => (string) $this->mail['subject'],
 				'HtmlBody' => $this->mail['bodyHTML'],
 				'TextBody' => $textBody,
 				'Tag' => $this->tag,
@@ -699,7 +699,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 	 * Only the recipient email addresses are logged (not names),
 	 * and any email addresses in the log entry are obfuscated.
 	 *
-	 * @param Postmark\Models\DynamicResponseModel $response
+	 * @param Postmark\Models\PostmarkResponse $response
 	 * @param string $to The recipient(s) of the message, used if the response does not include them
 	 *
 	 */

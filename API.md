@@ -186,7 +186,7 @@ $client = $mail->getClient();
 
 ### getResponse($index = null)
 
-Returns the Postmark API response (`Postmark\Models\DynamicResponseModel`)
+Returns the Postmark API response (`Postmark\Models\PostmarkResponse`)
 from the most recent single-recipient `send()`. If `$index` (int) is given,
 returns that specific response from a prior batch send instead.
 

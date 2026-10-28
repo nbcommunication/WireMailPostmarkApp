@@ -3,17 +3,17 @@
         colors="true"
          processIsolation="false"
          stopOnFailure="false"
-         syntaxCheck="false"
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true">
     <testsuites>
-        <testsuite>
+        <testsuite name="unit">
             <directory>tests/</directory>
+            <exclude>tests/PostmarkClientBaseTest.php</exclude>
         </testsuite>
     </testsuites>
 
     <logging>
-        <log type="junit" target="build/artifacts/logs/junit.xml" logIncompleteSkipped="false" />
+        <junit outputFile="build/unit_report.xml"/>
     </logging>
 </phpunit>

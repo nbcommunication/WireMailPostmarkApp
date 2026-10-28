@@ -6,28 +6,23 @@ workflows:
   php-tests:
     jobs:
       - unit-tests:
-          name: php70
-          version: "7.0"
+          name: php81
+          version: "8.1"
       - unit-tests:
-          name: php71
-          version: "7.1"
+          name: php82
+          version: "8.2"
           requires:
-            - php70
+            - php81
       - unit-tests:
-          name: php72
-          version: "7.2"
+          name: php83
+          version: "8.3"
           requires:
-            - php71
+            - php82
       - unit-tests:
-          name: php73
-          version: "7.3"
+          name: php84
+          version: "8.4"
           requires:
-            - php72
-      - unit-tests:
-          name: php74
-          version: "7.4"
-          requires:
-            - php73
+            - php83
 
 jobs:
   unit-tests:
@@ -37,7 +32,7 @@ jobs:
         type: string
 
     docker:
-      - image: circleci/php:<< parameters.version >>
+      - image: cimg/php:<< parameters.version >>
 
     steps:
       - checkout

@@ -719,27 +719,29 @@
         },
         {
             "name": "wildbit/postmark-php",
-            "version": "v4.0.5",
-            "version_normalized": "4.0.5.0",
+            "version": "v7.0.0",
+            "version_normalized": "7.0.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ActiveCampaign/postmark-php.git",
-                "reference": "b71efba061de7cf7e1f853d211b1c5edce4e3c5b"
+                "reference": "f0a53b741833d4b2d1a3827c0bd66e70f4d26d62"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ActiveCampaign/postmark-php/zipball/b71efba061de7cf7e1f853d211b1c5edce4e3c5b",
-                "reference": "b71efba061de7cf7e1f853d211b1c5edce4e3c5b",
+                "url": "https://api.github.com/repos/ActiveCampaign/postmark-php/zipball/f0a53b741833d4b2d1a3827c0bd66e70f4d26d62",
+                "reference": "f0a53b741833d4b2d1a3827c0bd66e70f4d26d62",
                 "shasum": ""
             },
             "require": {
-                "guzzlehttp/guzzle": "^6.0|^7.0",
-                "php": ">=7.0.0"
+                "guzzlehttp/guzzle": "^7.8",
+                "php": "~8.1 || ~8.2|| ~8.3 || ~8.4"
             },
             "require-dev": {
-                "phpunit/phpunit": "^6.0.0"
+                "friendsofphp/php-cs-fixer": "^3.40",
+                "phpstan/phpstan": "^1.10",
+                "phpunit/phpunit": "^10.0"
             },
-            "time": "2023-02-03T15:00:17+00:00",
+            "time": "2025-07-11T11:40:30+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -754,7 +756,7 @@
             "description": "The officially supported client for Postmark (http://postmarkapp.com)",
             "support": {
                 "issues": "https://github.com/ActiveCampaign/postmark-php/issues",
-                "source": "https://github.com/ActiveCampaign/postmark-php/tree/v4.0.5"
+                "source": "https://github.com/ActiveCampaign/postmark-php/tree/v7.0.0"
             },
             "install-path": "../wildbit/postmark-php"
         }

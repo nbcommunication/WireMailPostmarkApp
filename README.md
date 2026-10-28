@@ -9,7 +9,7 @@ Extends WireMail to use the Postmark API for sending emails.
 # Requirements
 - ProcessWire >= 3.0.123
 - PHP >= 8.1
-- [postmark-php](https://github.com/ActiveCampaign/postmark-php) ^4.0 (bundled with this module via Composer)
+- [postmark-php](https://github.com/ActiveCampaign/postmark-php) ^7.0 (bundled with this module via Composer)
 
 # API
 Prior to using this module, you must set up a server in your [Postmark account](https://account.postmarkapp.com/servers) and create an API Token. You should also set up a [Sender Signature](https://account.postmarkapp.com/signature_domains). Add the API Token and Sender Signature to the module configuration.
@@ -72,11 +72,11 @@ The following methods can be used in a chained statement:
 - For more details please see the documentation for [postmark-php](https://github.com/ActiveCampaign/postmark-php/wiki/Getting-Started).
 
 **getResponse(**_int_ **$index** = `null`**)** - Return the last send() response
-- Returns a `Postmark\Models\DynamicResponseModel` object.
+- Returns a `Postmark\Models\PostmarkResponse` object.
 - Pass an `$index` if you want to get a specific response from a batch send.
 
 **getResponses()** - Return the last batch send() responses
-- Returns an array of `Postmark\Models\DynamicResponseModel` objects.
+- Returns an array of `Postmark\Models\PostmarkResponse` objects.
 
 **send()** - Send the email.
 - Returns a positive number (indicating number of emails sent) or 0 on failure.
@@ -314,7 +314,7 @@ $config->wireMail('module', 'WireMailPostmarkApp');
 
 ## Changelog
 
-### 0.0.5
+### 0.1.0
 - Fixed: BCC recipients could be ignored in batch and template sends because the message array used the key `BCc` instead of Postmark's `Bcc`. Single sends were not affected.
 - Changed: per-recipient BCC overrides in template sends are now read from the `Bcc` recipient variable (previously `BCc`).
 - Fixed: exception handling in `init()` and `send()` caught an unqualified `Exception`, which resolved to the non-existent `ProcessWire\Exception`, so non-Postmark exceptions were not caught and escaped from `send()`. It now catches `\Throwable`, so these are logged instead.
@@ -326,3 +326,4 @@ $config->wireMail('module', 'WireMailPostmarkApp');
 - Changed: now requires PHP >= 8.1. The bundled dependencies already required it, so the module could not load on PHP 7.4/8.0.
 - Updated: bundled dependencies (Guzzle 7.16.1, guzzlehttp/psr7 2.13.2, guzzlehttp/promises 2.6.0). `composer.lock` was out of date with `vendor/` and has been regenerated; `composer audit` reports no advisories.
 - Fixed: PHP 8.5 deprecation (`finfo_close()`) and a warning when `ProcessForgotPassword` is not installed.
+- Changed: upgraded postmark-php from 4.0.5 to 7.0.0. **Breaking:** `getResponse()` and `getResponses()` now return `Postmark\Models\PostmarkResponse` objects instead of `DynamicResponseModel`. Use the properties `MessageID`, `To`, `Message`, `ErrorCode`, `SubmittedAt` exactly as written; array access (`$response['MessageID']`) and case-insensitive names are no longer supported. Code using `getClient()` directly should be checked against the postmark-php 7 API.
