@@ -661,9 +661,9 @@ class WireMailPostmarkApp extends WireMail implements Module {
 			}
 
 		} catch(PostmarkException $e) {
-			$this->log($e->getMessage());
+			$this->log($this->obfuscateEmails($e->getMessage()));
 		} catch(\Throwable $e) {
-			$this->log($e->getMessage());
+			$this->log($this->obfuscateEmails($e->getMessage()));
 		}
 
 		return $sent;
