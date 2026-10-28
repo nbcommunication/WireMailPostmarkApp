@@ -47,7 +47,6 @@ class WireTest_WireMailPostmarkApp extends WireTest {
 	 */
 	protected function getProtected($obj, $name) {
 		$rp = new \ReflectionProperty($obj, $name);
-		$rp->setAccessible(true);
 		return $rp->getValue($obj);
 	}
 
@@ -62,7 +61,6 @@ class WireTest_WireMailPostmarkApp extends WireTest {
 	 */
 	protected function callProtected($obj, $name, array $args = []) {
 		$rm = new \ReflectionMethod($obj, $name);
-		$rm->setAccessible(true);
 		return $rm->invokeArgs($obj, $args);
 	}
 

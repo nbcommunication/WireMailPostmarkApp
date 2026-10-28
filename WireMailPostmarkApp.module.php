@@ -44,7 +44,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 			'singular' => false,
 			'autoload' => false,
 			'icon' => 'envelope',
-			'requires' => 'ProcessWire>=3.0.123,PHP>=7.4',
+			'requires' => 'ProcessWire>=3.0.123,PHP>=8.1',
 		];
 	}
 
@@ -438,7 +438,8 @@ class WireMailPostmarkApp extends WireMail implements Module {
 		try {
 
 			// When sending a password reset email, prevent Open/Click Tracking
-			if($this->mail['subject'] == $this->wire()->modules->get('ProcessForgotPassword')->emailSubject) {
+			$emailSubject = $this->wire()->modules->get('ProcessForgotPassword')?->emailSubject;
+			if($emailSubject && $this->mail['subject'] == $emailSubject) {
 				$this->setTrackOpens(false);
 				$this->setTrackLinks(false);
 			}
@@ -820,9 +821,8 @@ class WireMailPostmarkApp extends WireMail implements Module {
 
 		} else if(function_exists('finfo_open')) {
 
-			$finfo = finfo_open(FILEINFO_MIME);
+			$finfo = finfo_open(FILEINFO_MIME_TYPE);
 			$mimeType = finfo_file($finfo, $file);
-			finfo_close($finfo);
 			return $mimeType;
 
 		} else {

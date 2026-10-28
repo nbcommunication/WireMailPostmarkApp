@@ -8,7 +8,7 @@ Extends WireMail to use the Postmark API for sending emails.
 
 # Requirements
 - ProcessWire >= 3.0.123
-- PHP >= 7.4
+- PHP >= 8.1
 - [postmark-php](https://github.com/ActiveCampaign/postmark-php) ^4.0 (bundled with this module via Composer)
 
 # API
@@ -323,3 +323,6 @@ $config->wireMail('module', 'WireMailPostmarkApp');
 - Fixed: batch and template sends returned the full recipient count if any response from the instance had ever succeeded. `send()` now returns the number of recipients whose messages Postmark accepted, and responses are cleared at the start of each send.
 - Fixed: in batch and template sends, cc/bcc recipients received a copy of every message. They are now only added to the first message.
 - Docs: removed `from()` from the README examples, as the From address is always the Sender Signature.
+- Changed: now requires PHP >= 8.1. The bundled dependencies already required it, so the module could not load on PHP 7.4/8.0.
+- Updated: bundled dependencies (Guzzle 7.16.1, guzzlehttp/psr7 2.13.2, guzzlehttp/promises 2.6.0). `composer.lock` was out of date with `vendor/` and has been regenerated; `composer audit` reports no advisories.
+- Fixed: PHP 8.5 deprecation (`finfo_close()`) and a warning when `ProcessForgotPassword` is not installed.
