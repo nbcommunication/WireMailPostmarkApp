@@ -307,15 +307,16 @@ $postmarkClient = $modules->get('WireMailPostmarkApp')->getClient();
 $postmarkClient->getOpenStatistics();
 ```
 
-## Changelog
-
-### 0.0.5
-- Fixed: BCC recipients were silently dropped when using batch sends or template sends due to an incorrect array key (`BCc` instead of `Bcc`).
-- Fixed: Exception handling in `init()` and `send()` referenced an unqualified `Exception` class, which would fatal error if a non-Postmark exception (e.g. a network-level exception) was thrown. Now correctly catches `\Exception`.
-
 ## Setting WireMailPostmarkApp as default
 
 If WireMailPostmarkApp is the only WireMail module you have installed, then you can skip this step. However, if you have multiple WireMail modules installed, and you want WireMailPostmarkApp to be the default one used by ProcessWire, then you should add the following to your /site/config.php file:
 ```php
 $config->wireMail('module', 'WireMailPostmarkApp');
 ```
+
+## Changelog
+
+### 0.0.5
+- Fixed: BCC recipients could be ignored in batch and template sends because the message array used the key `BCc` instead of Postmark's `Bcc`. Single sends were not affected.
+- Changed: per-recipient BCC overrides in template sends are now read from the `Bcc` recipient variable (previously `BCc`).
+- Fixed: exception handling in `init()` and `send()` caught an unqualified `Exception`, which resolved to the non-existent `ProcessWire\Exception`, so non-Postmark exceptions were not caught and escaped from `send()`. It now catches `\Throwable`, so these are logged instead.

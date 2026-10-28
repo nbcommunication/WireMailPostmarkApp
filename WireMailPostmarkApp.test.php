@@ -9,7 +9,7 @@
  *
  * Deliberately NOT covered: ___send() and any live batch/template sending, since those
  * require valid Postmark API credentials and network access. Treat that as a manual/
- * integration test rather than an automated one - see API.md.
+ * integration test rather than an automated one.
  *
  */
 class WireTest_WireMailPostmarkApp extends WireTest {

@@ -20,8 +20,10 @@ methods this module adds or overrides.
 Use the standard ProcessWire mail API - do not instantiate the class directly.
 
 ```php
-$mail = wireMail(); // Returns a WireMailPostmarkApp instance if module is installed/configured
+$mail = wireMail(); // Returns a WireMailPostmarkApp instance if it is the only WireMail module or is set as the default
 ```
+
+See README.md for setting it as the default with `$config->wireMail`.
 
 To be explicit or to check the type before calling module-specific methods:
 
@@ -154,11 +156,9 @@ Switches the send to use a Postmark Template rather than raw `body()` /
 $mail->setTemplate('welcome-email', ['companyName' => 'Acme Ltd']);
 ```
 
-Note: any `body()` / `bodyHTML()` content set is still used as the source for
-`{{variable}}` placeholder replacement of the message body/HTML body content
-sent alongside the template's own data via `TemplateModel`, i.e. `body`/
-`bodyHTML` are made available to the template as `TemplateModel` keys
-`body`/`bodyHTML`.
+Note: any `body()` / `bodyHTML()` content is passed to the template as the
+`TemplateModel` keys `body` and `bodyHTML`, with `{{variable}}` placeholders
+already replaced for each recipient.
 
 ### setTemplateVariables(array $variables)
 
@@ -189,9 +189,10 @@ returns that specific response from a prior batch send instead.
 
 ### getResponses()
 
-Returns the array of all responses from the most recent batch send (i.e.
-when the recipient count exceeded the auto-batch threshold, `setSendBatch()`
-was used, or a template send occurred).
+Returns the array of responses from batch sends (i.e. when the recipient
+count exceeded the auto-batch threshold, `setSendBatch()` was used, or a
+template send occurred). Responses accumulate across sends on the same
+instance; use a fresh `wireMail()` instance per send to keep them separate.
 
 ## send()
 
@@ -201,11 +202,10 @@ Standard `WireMail::send()`. Returns an `int`:
 - Batch/template send: the number of recipients (`0` if no responses were
   successful).
 
-Exceptions from the Postmark client (`PostmarkException` and generic
-`\Exception`) are caught internally and written to the module's log rather
-than being thrown - check the return value and/or `$modules->get('WireMailPostmarkApp')`'s
-log (Setup > Logs > wire-mail-postmark-app) rather than wrapping `send()` in
-a try/catch.
+Exceptions and errors (`PostmarkException` and any other `\Throwable`) are
+caught internally and written to the module's log rather than being thrown -
+check the return value and the log (Setup > Logs > wire-mail-postmark-app)
+rather than wrapping `send()` in a try/catch.
 
 ## Batching behaviour
 
@@ -214,8 +214,10 @@ a try/catch.
   `send()` call, they are automatically split into multiple batch API calls.
 - If more than 50 `to` recipients are set (`self::toLimit`) and no template
   is in use, sending automatically switches to batch mode, splitting
-  recipients into groups of 50 per outgoing message (each still delivered as
-  its own message, recipients don't see each other).
+  recipients into groups of 50 per outgoing message. Each message's `To` is
+  a list of all recipients in that group, so recipients in the same group
+  can see each other's addresses. Use `setSendBatch(true)` if each recipient
+  should receive their own message.
 - Call `setSendBatch(true)` to force per-recipient batch sending (one
   message per recipient, each with its own recipient-variable
   substitutions) even below the 50-recipient threshold - required if you
@@ -228,6 +230,6 @@ a try/catch.
 When not using a Postmark Template, `{{variableName}}` placeholders in the
 plain-text `body()` and HTML `bodyHTML()` content are replaced per-recipient
 using values from `setRecipientVariables()`. This only takes effect when
-batch sending is active (recipient count > 50, or `setSendBatch(true)` was
-called) - for a small number of recipients with per-recipient content, call
-`setSendBatch(true)` explicitly.
+`setSendBatch(true)` has been called. Automatic batching (more than 50
+recipients) does not replace placeholders, as each message goes to a group
+of recipients.

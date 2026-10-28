@@ -160,7 +160,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 			$this->bcc();
 		} catch(PostmarkException $e) {
 			$this->log($e->getMessage());
-		} catch(\Exception $e) {
+		} catch(\Throwable $e) {
 			$this->log($e->getMessage());
 		}
 	}
@@ -643,7 +643,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 
 		} catch(PostmarkException $e) {
 			$this->log($e->getMessage());
-		} catch(\Exception $e) {
+		} catch(\Throwable $e) {
 			$this->log($e->getMessage());
 		}
 
