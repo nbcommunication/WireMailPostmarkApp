@@ -550,10 +550,14 @@ class WireMailPostmarkApp extends WireMail implements Module {
 
 				$messages = [];
 				$messageRecipients = []; // The number of recipients for each message
+				// CC/BCC recipients are only added to the first message, so they receive one copy
+				$copies = ['Cc' => $message['Cc'], 'Bcc' => $message['Bcc']];
+				$noCopies = ['Cc' => null, 'Bcc' => null];
 				if($this->template) {
 
 					foreach($recipients as $sendTo => $variables) {
 
+						$cc = count($messages) ? $noCopies : $copies;
 						$variables = array_merge($this->templateVariables, $variables);
 						$variables['body'] = $this->populateVariables($message['TextBody'], $variables);
 						$variables['bodyHTML'] = $this->populateVariables($message['HtmlBody'], $variables);
@@ -567,8 +571,8 @@ class WireMailPostmarkApp extends WireMail implements Module {
 							'Tag' => $message['Tag'],
 							'TrackOpens' => $message['TrackOpens'],
 							'ReplyTo' => $message['ReplyTo'],
-							'Cc' => $variables['Cc'] ?? $message['Cc'],
-							'Bcc' => $variables['Bcc'] ?? $message['Bcc'],
+							'Cc' => $variables['Cc'] ?? $cc['Cc'],
+							'Bcc' => $variables['Bcc'] ?? $cc['Bcc'],
 							'Headers' => $message['Headers'],
 							'Attachments' => $message['Attachments'],
 							'TrackLinks' => $message['TrackLinks'],
@@ -581,7 +585,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 				} else if($this->sendBatch) {
 
 					foreach($recipients as $sendTo => $variables) {
-						$messages[] = array_merge($message, [
+						$messages[] = array_merge($message, count($messages) ? $noCopies : $copies, [
 							'To' => $sendTo,
 							'HtmlBody' => $this->populateVariables($message['HtmlBody'], $variables),
 							'TextBody' => $this->populateVariables($message['TextBody'], $variables),
@@ -598,6 +602,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 						$group = array_slice($to, $offset, $limit);
 						$messages[] = array_merge(
 							$message,
+							count($messages) ? $noCopies : $copies,
 							[
 								'To' => $this->getEmails($group),
 							]

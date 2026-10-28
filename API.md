@@ -8,12 +8,14 @@ installation and configuration instructions see README.md.
 
 WireMailPostmarkApp extends ProcessWire's `WireMail` class to send email via
 the [Postmark](https://postmarkapp.com) API, using the official
-`postmarkapp/postmark-php` client library (bundled in `vendor/`).
+`wildbit/postmark-php` client library (bundled in `vendor/`).
 
-Because it extends `WireMail`, all standard `WireMail` methods (`to()`,
-`from()`, `fromName()`, `subject()`, `body()`, `bodyHTML()`, `attachment()`,
-`header()`, `send()`, etc) work as normal. This document focuses on the
-methods this module adds or overrides.
+Because it extends `WireMail`, the standard `WireMail` methods (`to()`,
+`replyTo()`, `subject()`, `body()`, `bodyHTML()`, `attachment()`, `header()`,
+`send()`, etc) work as normal. The exception is `from()` / `fromName()`,
+which are ignored: the From address is always the Sender Signature (see
+`setSenderSignature()`). This document focuses on the methods this module
+adds or overrides.
 
 ## Getting an instance
 
@@ -53,7 +55,8 @@ and read as properties on the module:
 ### cc($email = null, $name = null)
 
 Add one or more CC recipients. Accumulates across calls; pass `null` to
-clear all previously set CC addresses.
+clear all previously set CC addresses. In batch and template sends, CC
+recipients are only added to the first message, so they receive one copy.
 
 ```php
 $mail->cc('someone@example.com');

@@ -28,11 +28,11 @@ The following methods can be used in a chained statement:
 - To include a name, use the format "Full Name \<sender@domain.com\>" for the address.
 
 **cc(**_string|array|null_ **$email)** - Set a "cc" email address.
-- Only used when `$sendBatch` is set to `false`.
+- When batch sending or using a template, cc recipients are only added to the first message, so they receive one copy.
 - Please refer to [WireMail::to()](https://processwire.com/api/ref/wire-mail/to/) for more information on how to use this method.
 
 **bcc(**_string|array|null_ **$email)** - Set a "bcc" email address.
-- Only used when `$sendBatch` is set to `false`.
+- When batch sending or using a template, bcc recipients are only added to the first message, so they receive one copy.
 - Please refer to [WireMail::to()](https://processwire.com/api/ref/wire-mail/to/) for more information on how to use this method.
 
 **attachInlineImage(**_string_ **$file**, _string_ **$filename)** - Add an inline image for referencing in HTML.
@@ -52,7 +52,7 @@ The following methods can be used in a chained statement:
 
 **setSendBatch(**_bool_ **$sendBatch)** - Set the batch mode.
 - This is off by default, meaning that a single email is sent with each recipient seeing the other recipients
-- If this is on, any email addresses set by `cc()` and `bcc()` will be ignored
+- If this is on, any email addresses set by `cc()` and `bcc()` are only added to the first message
 - Postmark has a limit on 50 email addresses per message and 500 messages per batch request. This module will split the recipients into batches if necessary and will also split up batches of messages too.
 
 **setRecipientVariables(**_array_ **$variables**, _string_ **$email** = ''**)** - Set the recipient variables
@@ -84,12 +84,11 @@ The following methods can be used in a chained statement:
 ## Examples
 
 ### Basic Example
-Send an email:
+Send an email. The From address is the Sender Signature set in the module configuration (or by `setSenderSignature()`); `from()` is not used.
 
 ```php
 $postmark = $mail->new();
 $sent = $postmark->to('user@domain.com')
-	->from('you@company.com')
 	->subject('Message Subject')
 	->body('Message Body')
 	->send();
@@ -105,7 +104,6 @@ $postmark->to([
 		'user@domain.com' => 'A User',
 		'user2@domain.com' => 'Another User',
 	])
-	->from('you@company.com', 'Company Name')
 	->replyTo('reply@company.com', 'Company Name')
 	->subject('Message Subject')
 	->bodyHTML(
@@ -140,7 +138,7 @@ $postmark->setSenderSignature('Alternate <another@company.com>') // Use a differ
 	->setTemplateVariables(['key3' => 'value3']); // Set template variables
 
 
-// Batch mode is set to false, so 1 returned if successful
+// A template is used, so each recipient is sent their own message and 2 is returned if successful
 $numSent = $postmark->send();
 
 echo 'The email was ' . ($numSent ? '' : 'not ') . 'sent.';
@@ -323,3 +321,5 @@ $config->wireMail('module', 'WireMailPostmarkApp');
 - Added: responses without a `MessageID` are now logged with Postmark's error message and code. Recipient email addresses are logged (not names) and obfuscated, e.g. `us****me@domain.com`.
 - Fixed: the "Track links?" module setting was ignored because the toggle value (`1`/`0`) wasn't mapped to a Postmark option, so link tracking was always `None` unless set in code.
 - Fixed: batch and template sends returned the full recipient count if any response from the instance had ever succeeded. `send()` now returns the number of recipients whose messages Postmark accepted, and responses are cleared at the start of each send.
+- Fixed: in batch and template sends, cc/bcc recipients received a copy of every message. They are now only added to the first message.
+- Docs: removed `from()` from the README examples, as the From address is always the Sender Signature.
