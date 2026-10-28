@@ -49,6 +49,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 	}
 
 	const batchLimit = 500;
+	const emailPattern = '/([^\s@<>,;:\'"]+)@([^\s@<>,;:\'"]+\.[a-z]{2,})/i';
 	const optionsTrackLinks = ['None', 'HtmlAndText', 'HtmlOnly', 'TextOnly'];
 	const toLimit = 50;
 
@@ -606,9 +607,11 @@ class WireMailPostmarkApp extends WireMail implements Module {
 						$this->client->sendEmailBatchWithTemplate($batchMessages) :
 						$this->client->sendEmailBatch($batchMessages);
 
-					foreach($responses as $response) {
+					foreach($responses as $i => $response) {
 						if($response->MessageID) {
 							$this->responses[] = $response;
+						} else {
+							$this->logResponseError($response, $batchMessages[$i]['To'] ?? '');
 						}
 					}
 
@@ -639,6 +642,7 @@ class WireMailPostmarkApp extends WireMail implements Module {
 				);
 
 				$sent = $this->response->MessageID ? 1 : 0;
+				if(!$sent) $this->logResponseError($this->response, $this->getEmails($to));
 			}
 
 		} catch(PostmarkException $e) {
@@ -672,6 +676,46 @@ class WireMailPostmarkApp extends WireMail implements Module {
 			$items[] = empty($name) ? $email : "{$name} <{$email}>";
 		}
 		return implode(',', $items);
+	}
+
+	/**
+	 * Log a response that has no MessageID
+	 *
+	 * Only the recipient email addresses are logged (not names),
+	 * and any email addresses in the log entry are obfuscated.
+	 *
+	 * @param Postmark\Models\DynamicResponseModel $response
+	 * @param string $to The recipient(s) of the message, used if the response does not include them
+	 *
+	 */
+	protected function logResponseError($response, $to = '') {
+		preg_match_all(self::emailPattern, (string) ($response->To ?: $to), $matches);
+		$this->log($this->obfuscateEmails(sprintf(
+			'Not sent to %s: %s (ErrorCode %s)',
+			count($matches[0]) ? implode(', ', $matches[0]) : 'unknown',
+			$response->Message ?: 'No message returned',
+			$response->ErrorCode ?: 'unknown'
+		)));
+	}
+
+	/**
+	 * Obfuscate the local part of any email addresses in a string
+	 *
+	 * e.g. username@domain.com becomes us****me@domain.com
+	 *
+	 * @param string $str
+	 * @return string
+	 *
+	 */
+	protected function obfuscateEmails($str) {
+		return preg_replace_callback(self::emailPattern, function($m) {
+			$local = $m[1];
+			$length = strlen($local);
+			$local = $length > 4 ?
+				substr($local, 0, 2) . str_repeat('*', $length - 4) . substr($local, -2) :
+				substr($local, 0, 1) . str_repeat('*', $length - 1);
+			return "$local@$m[2]";
+		}, (string) $str);
 	}
 
 	/**
